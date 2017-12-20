@@ -1,0 +1,42 @@
+<template name="Bootstrap3Tabs">
+	<div class="bootstrap3tabs">
+		<ul class="nav nav-tabs" role="tablist">
+			{{#each tabs}}
+				{{>Bootstrap3TabDefault}}
+			{{/each}}
+		</ul>
+		<!-- Tab panes -->
+		<div class="tab-content">
+			{{#each tabs}}
+				{{#unless tabIsTemplate}}
+					{{>Bootstrap3TabPanelDefault}}
+				{{/unless}}
+			{{/each}}
+			<div style="margin-top:10px">
+			{{>UI.dynamic template=activeTemplate}}
+			</div>
+		</div>
+	</div>
+</template>
+
+<template name="Bootstrap3TabDefault">
+	<li role="presentation" class="tab {{name}} {{active}}">
+		<a href="#{{name}}" aria-controls="{{name}}" role="tab" data-toggle="tab">{{title}}</a>
+	</li>
+</template>
+
+<template name="Bootstrap3TabPanelDefault">
+	<div role="tabpanel" class="tab-pane {{active}}" style="margin-top:10px" id="{{name}}">
+		{{{body}}}
+	</div>
+</template>
+
+<template name="Bootstrap3TabPanelDefaultX">
+	<div role="tabpanel" class="tab-pane {{active}}" style="margin-top:10px" id="{{name}}">
+		{{#if template}}
+			{{>UI.dynamic template=template}}
+		{{else}}
+			{{{body}}}
+		{{/if}}
+	</div>
+</template>
