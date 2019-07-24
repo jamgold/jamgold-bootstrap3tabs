@@ -1,16 +1,16 @@
-// Write your package code here!
 Bootstrap3Tab = function() {
-	var members = ['name', 'title', 'body'];
+	var members = ['name', 'title', 'body', 'module'];
 	if(arguments.length>0)
 	{
 		for(var i=0;i<arguments.length;i++)
 		{
 			if(typeof arguments[i] == 'string')
 			{
-				if(i<=members.length)
+				if(i<=members.length){
 					this[members[i]] = arguments[i];
-				else
+				} else {
 					console.log('Bootstrap3Tab: we do not know where to put this', arguments[1]);
+				}
 			}
 			else
 			{
@@ -25,6 +25,7 @@ Bootstrap3Tab = function() {
 					if(n in this) this[n] = v;
 					else console.log('Bootstrap3Tab: unknown member', n);
 				}
+				// console.log('Bootstrap3Tab', this);
 			}
 		}
 	}
@@ -32,16 +33,16 @@ Bootstrap3Tab = function() {
 	// active needs to be the classname active if true
 	//
 	this.active = this.active ? 'active' : '';
-}
+};
 Bootstrap3Tab.prototype = {
   name: '',
   title: '',
   body: '',
   active: '', // classname
   template: false,
+  module: null,
   mobileUrl: ''
 };
-
 Bootstrap3Tabs = function(name) {
 	if(name === undefined) throw new Meteor.error('500','Bootstrap3Tabs needs a name');
 	this.name = name;
@@ -55,8 +56,7 @@ Bootstrap3Tabs = function(name) {
 			this.add(new Bootstrap3Tab(tab));
 		}
 	}
-}
-
+};
 Bootstrap3Tabs.prototype = {
 	name: 'Bootstrap3Tabs',
 	tabs: [],
@@ -65,56 +65,60 @@ Bootstrap3Tabs.prototype = {
 		// console.log('Bootstrap3Tabs.add', typeof tab, tab, this);
 		this.tabs.push(tab);
 	}
-}
-Template.Bootstrap3Tabs.onCreated(function(){
-	var template = this;
-	template.activeTab = new ReactiveVar('');
-	template.tabTemplate = new ReactiveVar('');
-	template.tabs = [];
-	template.findTemplate = function(tab) {
+};
+Template.Bootstrap3Tabs.onCreated(function Bootstrap3TabsOnCreated(){
+	const instance = this;
+	instance.activeTab = new ReactiveVar('');
+	instance.tabTemplate = new ReactiveVar('');
+	instance.tabs = instance.data.tabs;
+	instance.findTemplate = function(tab) {
+		// console.log(`findTemplate ${tab}`)
 		var useTemplate = null;
-		for(var i in template.tabs)
+		for(var i in instance.tabs)
 		{
-			var tt = template.tabs[i];
+			var tt = instance.tabs[i];
 			if(tt.name == tab && 'template' in tt && tt.template)
 				useTemplate = tt.template;
 		}
 		return useTemplate;
 	}
 });
-Template.Bootstrap3Tabs.onRendered(function(){
-	var template = this;
-	template.tabs = template.data.tabs;
-	template.$('a[role="tab"]').on('shown.bs.tab', function(e) {
+Template.Bootstrap3Tabs.onRendered(function Bootstrap3TabsOnRendered(){
+	const instance = this;
+	// instance.tabs = instance.data.tabs;
+	instance.$('a[role="tab"]').on('shown.bs.tab', function(e) {
 		var tab = e.currentTarget.attributes.getNamedItem('aria-controls').value;
-		var useTemplate = template.findTemplate(tab);
-		template.activeTab.set(tab);
-		template.tabTemplate.set(useTemplate);
+		var useTemplate = instance.findTemplate(tab);
+		instance.activeTab.set(tab);
+		instance.tabTemplate.set(useTemplate);
 	});
-	template.$('li.active a[role="tab"]').each(function(){
+	instance.$('li.active a[role="tab"]').each(function(){
 		var tab = this.attributes.getNamedItem('aria-controls').value;
-		var useTemplate = template.findTemplate(tab);
-		template.activeTab.set(tab);
-		template.tabTemplate.set(useTemplate);
+		var useTemplate = instance.findTemplate(tab);
+		instance.activeTab.set(tab);
+		instance.tabTemplate.set(useTemplate);
 		// console.log(template.view.name+'.rendered '+tab+' '+useTemplate);
 	});
 });
 Template.Bootstrap3Tabs.helpers({
-	activeTab: function() {
-		var template = Template.instance();
-		return template.activeTab.get();
+	activeTab: function Bootstrap3TabsActiveTab() {
+		const instance = Template.instance();
+		return instance.activeTab.get();
 	},
-	tabIsTemplate: function() {
-		var template = Template.instance();
-		// var activeTab = template.activeTab.get();
+	tabIsTemplate: function Bootstrap3TabsTabIsTemplate() {
+		// const instance = Template.instance();
+		// var activeTab = instance.activeTab.get();
 		var isTemplate = 'template' in this && this.template;
 		// console.log('tabIsTemplate', isTemplate, this);
 		return isTemplate;
 	},
-	activeTemplate: function() {
-		var template = Template.instance();
-		var tabTemplate = template.tabTemplate.get();
-		// console.log('activeTemplate', tabTemplate);
+	//
+	// this is where we could make it dynamic
+	//
+	activeTemplate: function Bootstrap3TabsActiveTemplate() {
+		const instance = Template.instance();
+		var tabTemplate = instance.tabTemplate.get();
+		// console.log(`activeTemplate ${tabTemplate}`);
 		return tabTemplate;
 	}
 });

@@ -30,13 +30,3 @@
 		{{{body}}}
 	</div>
 </template>
-
-<template name="Bootstrap3TabPanelDefaultX">
-	<div role="tabpanel" class="tab-pane {{active}}" style="margin-top:10px" id="{{name}}">
-		{{#if template}}
-			{{>UI.dynamic template=template}}
-		{{else}}
-			{{{body}}}
-		{{/if}}
-	</div>
-</template>
